@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg-new.jpg";
 
 const HeroSection = () => {
   return (
@@ -11,17 +11,20 @@ const HeroSection = () => {
         style={{ backgroundImage: `url(${heroBg})` }}
       />
       
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/30 to-background/90" />
+      {/* Light overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/90" />
       
       {/* Content */}
       <div className="container relative z-10 text-center px-4">
         <div className="animate-fade-up">
-          <img 
-            src={logo} 
-            alt="AS Protein Logo" 
-            className="h-16 md:h-20 mx-auto mb-8 animate-float brightness-200 invert"
-          />
+          {/* Prominent Logo */}
+          <div className="bg-foreground/90 px-8 py-4 rounded-xl inline-block mb-10 shadow-lg">
+            <img 
+              src={logo} 
+              alt="AS Protein Logo" 
+              className="h-16 md:h-20 lg:h-24 animate-float invert"
+            />
+          </div>
           
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-foreground mb-4 tracking-wide">
             FUEL YOUR <span className="text-gradient">POTENTIAL</span>

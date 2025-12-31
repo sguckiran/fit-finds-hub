@@ -25,7 +25,7 @@ const tips = [
 
 const FitnessTips = () => {
   return (
-    <section id="tips" className="py-20 md:py-32 gradient-hero">
+    <section id="tips" className="py-20 md:py-32 bg-background">
       <div className="container px-4">
         <div className="text-center mb-16">
           <span className="text-primary font-semibold uppercase tracking-widest text-sm">
@@ -43,7 +43,7 @@ const FitnessTips = () => {
           {tips.map((tip, index) => (
             <div
               key={tip.title}
-              className="group gradient-card p-8 rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow"
+              className="group bg-card p-8 rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="gradient-accent w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">

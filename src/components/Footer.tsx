@@ -3,11 +3,11 @@ import logo from "@/assets/logo.png";
 
 const Footer = () => {
   return (
-    <footer className="py-12 border-t border-border">
+    <footer className="py-12 border-t border-border bg-background">
       <div className="container px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-4">
-            <img src={logo} alt="AS Protein" className="h-10 brightness-200 invert" />
+            <img src={logo} alt="AS Protein" className="h-12" />
             <span className="text-muted-foreground">
               Fuel Your Potential
             </span>
