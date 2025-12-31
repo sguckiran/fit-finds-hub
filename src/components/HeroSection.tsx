@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
-import heroBg from "@/assets/hero-bg-new.jpg";
+import heroBg from "@/assets/hero-personal.jpg";
 
 const HeroSection = () => {
   return (
@@ -12,7 +12,7 @@ const HeroSection = () => {
       />
       
       {/* Light overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background/80" />
       
       {/* Content */}
       <div className="container relative z-10 text-center px-4">
