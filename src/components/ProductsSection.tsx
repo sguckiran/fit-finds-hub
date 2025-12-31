@@ -33,7 +33,7 @@ const products = [
 
 const ProductsSection = () => {
   return (
-    <section id="products" className="py-20 md:py-32 bg-secondary/30">
+    <section id="products" className="py-20 md:py-32 bg-secondary/50">
       <div className="container px-4">
         <div className="text-center mb-16">
           <span className="text-primary font-semibold uppercase tracking-widest text-sm">
@@ -51,7 +51,7 @@ const ProductsSection = () => {
           {products.map((product) => (
             <div
               key={product.name}
-              className="group gradient-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow"
+              className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow"
             >
               {/* Product Image Placeholder */}
               <div className="h-48 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
@@ -74,7 +74,7 @@ const ProductsSection = () => {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-primary fill-primary" : "text-muted"}`}
+                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-foreground fill-foreground" : "text-muted"}`}
                       />
                     ))}
                   </div>
