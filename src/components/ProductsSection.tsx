@@ -1,110 +1,253 @@
 import { Button } from "@/components/ui/button";
 import { Star, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useMemo, useState, useEffect } from "react";
 
-const products = [
-  {
-    name: "Optimum Nutrition Gold Standard Whey",
-    category: "Protein Powder",
-    rating: 4.8,
-    reviews: "125K+",
-    price: "$64.99",
-    amazonUrl: "https://amazon.com",
-    description: "The world's best-selling whey protein with 24g protein per serving.",
-  },
-  {
-    name: "Creatine Monohydrate",
-    category: "Performance",
-    rating: 4.9,
-    reviews: "89K+",
-    price: "$22.99",
-    amazonUrl: "https://amazon.com",
-    description: "Increase strength and power output with pure micronized creatine.",
-  },
-  {
-    name: "Pre-Workout Energy Formula",
-    category: "Energy",
-    rating: 4.7,
-    reviews: "45K+",
-    price: "$39.99",
-    amazonUrl: "https://amazon.com",
-    description: "Explosive energy and focus for intense training sessions.",
-  },
+interface RawProduct {
+	name: string;
+	category: string;
+	rating: number;
+	reviews: string;
+	basePrice: number;
+	amazonUrl: string;
+	description: string;
+}
+
+// Default templates (used if products.txt can't be fetched or parsed)
+const defaultBaseProducts: RawProduct[] = [
+	{
+		name: "Optimum Nutrition Gold Standard Whey",
+		category: "Proteinpulver",
+		rating: 4.8,
+		reviews: "125K+",
+		basePrice: 64.99,
+		amazonUrl: "https://amazon.com",
+		description: "Weltweit meistverkauftes Whey-Protein mit 24 g Protein pro Portion.",
+	},
+	{
+		name: "Creatine Monohydrate",
+		category: "Leistungssteigerung",
+		rating: 4.9,
+		reviews: "89K+",
+		basePrice: 22.99,
+		amazonUrl: "https://amazon.com",
+		description: "Steigere Kraft und Leistungsfähigkeit mit reinem, mikronisiertem Kreatin.",
+	},
+	{
+		name: "Pre-Workout Energy Formula",
+		category: "Energie",
+		rating: 4.7,
+		reviews: "45K+",
+		basePrice: 39.99,
+		amazonUrl: "https://amazon.com",
+		description: "Explosive Energie und Fokus für intensive Trainingseinheiten.",
+	},
+	{
+		name: "Multivitamin Complex",
+		category: "Gesundheit",
+		rating: 4.6,
+		reviews: "12K+",
+		basePrice: 19.99,
+		amazonUrl: "https://amazon.com",
+		description: "Komplexes Tagesmultivitamin zur Unterstützung der allgemeinen Gesundheit.",
+	},
+	{
+		name: "Whey Isolate Premium",
+		category: "Protein",
+		rating: 4.8,
+		reviews: "34K+",
+		basePrice: 79.99,
+		amazonUrl: "https://amazon.com",
+		description: "Schnell absorbierbares Whey-Isolat zur Erhaltung schlanker Muskulatur.",
+	},
+	{
+		name: "Omega-3 Fish Oil",
+		category: "Regeneration",
+		rating: 4.5,
+		reviews: "23K+",
+		basePrice: 24.99,
+		amazonUrl: "https://amazon.com",
+		description: "Hochdosiertes EPA/DHA für Herz- und Gelenkgesundheit.",
+	},
 ];
 
-const ProductsSection = () => {
-  return (
-    <section id="products" className="py-20 md:py-32 bg-secondary/50">
-      <div className="container px-4">
-        <div className="text-center mb-16">
-          <span className="text-primary font-semibold uppercase tracking-widest text-sm">
-            Recommended
-          </span>
-          <h2 className="font-display text-4xl md:text-6xl text-foreground mt-3 mb-4">
-            TOP SUPPLEMENTS
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Personally tested and recommended supplements to support your training.
-          </p>
-        </div>
+// Helper: generate a larger product list by cycling base templates
+const generateProducts = (bases: RawProduct[], total = 30) => {
+	return Array.from({ length: total }).map((_, i) => {
+		const base = bases[i % bases.length];
+		const copyIndex = Math.floor(i / bases.length) + 1;
+		const price = (base.basePrice + (i % 7) * 2).toFixed(2);
+		return {
+			name: `${base.name} ${copyIndex}`,
+			category: base.category,
+			rating: +(base.rating - (i % 3) * 0.05).toFixed(2),
+			reviews: base.reviews,
+			price: `$${price}`,
+			amazonUrl: base.amazonUrl,
+			description: base.description,
+		};
+	});
+};
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {products.map((product) => (
-            <div
-              key={product.name}
-              className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow"
-            >
-              {/* Product Image Placeholder */}
-              <div className="h-48 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
-                <span className="text-6xl opacity-30">💪</span>
-              </div>
-              
-              <div className="p-6">
-                <span className="text-primary text-sm font-medium uppercase tracking-wider">
-                  {product.category}
-                </span>
-                <h3 className="font-display text-xl text-foreground mt-2 mb-2 leading-tight">
-                  {product.name}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  {product.description}
-                </p>
-                
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-foreground fill-foreground" : "text-muted"}`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-muted-foreground text-sm">
-                    {product.rating} ({product.reviews} reviews)
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="font-display text-2xl text-foreground">
-                    {product.price}
-                  </span>
-                  <Button variant="default" size="sm" asChild>
-                    <a href={product.amazonUrl} target="_blank" rel="noopener noreferrer">
-                      View on Amazon
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <p className="text-center text-muted-foreground text-sm mt-8">
-          *As an Amazon Associate, I earn from qualifying purchases.
-        </p>
-      </div>
-    </section>
-  );
+const parseProductsTxt = (text: string): RawProduct[] => {
+	const lines = text.split(/\r?\n/);
+	const products: RawProduct[] = [];
+	for (const raw of lines) {
+		const line = raw.trim();
+		if (!line || line.startsWith("#")) continue; // ignore comments/empty
+		// Expect pipe-separated fields: name|category|rating|reviews|basePrice|amazonUrl|description
+		const parts = line.split("|");
+		if (parts.length < 7) continue; // skip malformed
+		const [name, category, ratingStr, reviews, basePriceStr, amazonUrl, ...descParts] = parts;
+		const description = descParts.join("|").trim();
+		const rating = parseFloat(ratingStr) || 0;
+		const basePrice = parseFloat(basePriceStr) || 0;
+		products.push({ name: name.trim(), category: category.trim(), rating, reviews: reviews.trim(), basePrice, amazonUrl: amazonUrl.trim(), description });
+	}
+	return products;
+};
+
+const ProductsSection = () => {
+	const [query, setQuery] = useState("");
+	const [products, setProducts] = useState(() => generateProducts(defaultBaseProducts));
+	const [loading, setLoading] = useState(false);
+	const [source, setSource] = useState<"file" | "default">("default");
+
+	// Load products from products.txt with fallback to defaults
+	const loadProducts = async () => {
+		setLoading(true);
+		try {
+			const res = await fetch("/products.txt");
+			if (!res.ok) throw new Error("Failed to fetch products.txt");
+			const text = await res.text();
+			const parsed = parseProductsTxt(text);
+			if (parsed.length === 0) {
+				setSource("default");
+				setProducts(generateProducts(defaultBaseProducts));
+				console.warn("ProductsSection: products.txt parsed to empty list; using defaults.");
+			} else {
+				// Map parsed entries to a fixed list of 30 products. If an index is missing, fill with placeholder.
+				setSource("file");
+				const total = 30;
+				const finalProducts = Array.from({ length: total }).map((_, i) => {
+					const p = parsed[i];
+					if (p) {
+						return {
+							name: p.name,
+							category: p.category,
+							rating: p.rating,
+							reviews: p.reviews,
+							price: `$${p.basePrice.toFixed(2)}`,
+							amazonUrl: p.amazonUrl,
+							description: p.description,
+						};
+					}
+					// Placeholder for missing entries
+					return {
+						name: `Unknown Product ${i + 1}`,
+						category: "Unbekannt",
+						rating: 0,
+						reviews: "0",
+						price: "0£",
+						amazonUrl: "#",
+						description: "Keine Daten vorhanden.",
+					};
+				});
+				setProducts(finalProducts);
+			}
+		} catch (err: any) {
+			console.warn("ProductsSection: could not load products.txt, using defaults.", err?.message ?? err);
+			setSource("default");
+			setProducts(generateProducts(defaultBaseProducts));
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		let mounted = true;
+		loadProducts();
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	const filteredProducts = useMemo(() => {
+		const q = query.trim().toLowerCase();
+		if (!q) return products;
+		return products.filter((p) => {
+			return (
+				p.name.toLowerCase().includes(q) ||
+				p.category.toLowerCase().includes(q) ||
+				p.description.toLowerCase().includes(q)
+			);
+		});
+	}, [query, products]);
+
+	return (
+		<section id="products" className="py-20 md:py-32 bg-secondary/50">
+			<div className="container px-4">
+				<div className="text-center mb-16">
+					<span className="text-primary font-semibold uppercase tracking-widest text-sm">Empfohlen</span>
+					<h2 className="font-display text-4xl md:text-6xl text-foreground mt-3 mb-4">TOP NAHRUNGSERGÄNZUNGSMITTEL</h2>
+					<p className="text-muted-foreground max-w-xl mx-auto">Persönlich getestet und empfohlene Supplements zur Unterstützung deines Trainings.</p>
+				</div>
+
+				{/* Search bar + controls */}
+				<div className="max-w-2xl mx-auto mb-8">
+					<div className="flex gap-2">
+						<Input placeholder="Produkte, Kategorien oder Beschreibungen durchsuchen..." value={query} onChange={(e) => setQuery(e.target.value)} />
+						{query ? (
+							<Button variant="outline" size="sm" onClick={() => setQuery("")}>Löschen</Button>
+						) : (
+							<Button variant="default" size="sm" onClick={() => setQuery("")}>Alle</Button>
+						)}
+
+						{/* Reload products.txt at runtime */}
+						<Button variant="ghost" size="sm" onClick={loadProducts} disabled={loading}>
+							{loading ? "Lädt..." : "Neu laden"}
+						</Button>
+					</div>
+					<p className="text-muted-foreground text-sm mt-2">Zeige {filteredProducts.length} von {products.length} Produkten · Quelle: {source === "file" ? "products.txt" : "Standarddaten"}</p>
+				</div>
+
+				<div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+					{filteredProducts.map((product) => (
+						<div key={product.name} className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow">
+							{/* Product Image Placeholder */}
+							<div className="h-48 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
+								<span className="text-6xl opacity-30">💪</span>
+							</div>
+
+							<div className="p-6">
+								<span className="text-primary text-sm font-medium uppercase tracking-wider">{product.category}</span>
+								<h3 className="font-display text-xl text-foreground mt-2 mb-2 leading-tight">{product.name}</h3>
+								<p className="text-muted-foreground text-sm mb-4">{product.description}</p>
+
+								<div className="flex items-center gap-2 mb-4">
+									<div className="flex">
+										{[...Array(5)].map((_, i) => (
+											<Star key={i} className={`w-4 h-4 ${i < Math.floor((product as any).rating) ? "text-foreground fill-foreground" : "text-muted"}`} />
+										))}
+									</div>
+									<span className="text-muted-foreground text-sm">{(product as any).rating} ({(product as any).reviews} Bewertungen)</span>
+								</div>
+
+								<div className="flex items-center justify-between">
+									<span className="font-display text-2xl text-foreground">{(product as any).price}</span>
+									<Button variant="default" size="sm" asChild>
+										<a href={(product as any).amazonUrl} target="_blank" rel="noopener noreferrer">Bei Amazon ansehen<ExternalLink className="w-4 h-4" /></a>
+									</Button>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+
+				<p className="text-center text-muted-foreground text-sm mt-8">*Als Amazon-Partner verdiene ich an qualifizierten Verkäufen.</p>
+			</div>
+		</section>
+	);
 };
 
 export default ProductsSection;

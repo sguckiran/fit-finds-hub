@@ -66,15 +66,36 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent horizontal overflow on small screens */
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-body);
+    font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Defensive: prevent horizontal scroll caused by large children */
+    overflow-x: hidden;
+  }
+
+  /* Use border-box sizing globally to make width calculations predictable */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* Ensure images and svgs scale responsively and don't force overflow */
+  img, svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Prevent flex/grid children from overflowing their containers on mobile */
+  .container, .container * , .grid, section, main {
+    min-width: 0;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
+    font-family: var(--font-display), "Bebas Neue", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     letter-spacing: 0.02em;
   }
 }
