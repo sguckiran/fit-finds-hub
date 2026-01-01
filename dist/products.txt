@@ -1,0 +1,9 @@
+# Editable products file (pipe-separated). Header fields: name|category|rating|reviews|basePrice|amazonUrl|description
+# Lines starting with # are ignored.
+Optimum Nutrition Gold Standard Whey|Proteinpulver|4.8|125K+|64.99|https://amazon.com|Weltweit meistverkauftes Whey-Protein mit 24 g Protein pro Portion.
+Creatine Monohydrate|Leistungssteigerung|4.9|89K+|22.99|https://amazon.com|Steigere Kraft und Leistungsfähigkeit mit reinem, mikronisiertem Kreatin.
+Pre-Workout Energy Formula|Energie|4.7|45K+|39.99|https://amazon.com|Explosive Energie und Fokus für intensive Trainingseinheiten.
+Multivitamin Complex|Gesundheit|4.6|12K+|19.99|https://amazon.com|Komplexes Tagesmultivitamin zur Unterstützung der allgemeinen Gesundheit.
+Whey Isolate Premium|Protein|4.8|34K+|79.99|https://amazon.com|Schnell absorbierbares Whey-Isolat zur Erhaltung schlanker Muskulatur.
+Omega-3 Fish Oil|Regeneration|4.5|23K+|24.99|https://amazon.com|Hochdosiertes EPA/DHA für Herz- und Gelenkgesundheit.
+
