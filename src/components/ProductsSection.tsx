@@ -13,6 +13,17 @@ interface RawProduct {
 	description: string;
 }
 
+// New: runtime product shape used by the UI
+interface Product {
+	name: string;
+	category: string;
+	rating: number;
+	reviews: string;
+	price: string; // formatted with currency symbol
+	amazonUrl: string;
+	description: string;
+}
+
 // Default templates (used if products.txt can't be fetched or parsed)
 const defaultBaseProducts: RawProduct[] = [
 	{
@@ -72,7 +83,7 @@ const defaultBaseProducts: RawProduct[] = [
 ];
 
 // Helper: generate a larger product list by cycling base templates
-const generateProducts = (bases: RawProduct[], total = 30) => {
+const generateProducts = (bases: RawProduct[], total = 36): Product[] => {
 	return Array.from({ length: total }).map((_, i) => {
 		const base = bases[i % bases.length];
 		const copyIndex = Math.floor(i / bases.length) + 1;
@@ -82,7 +93,7 @@ const generateProducts = (bases: RawProduct[], total = 30) => {
 			category: base.category,
 			rating: +(base.rating - (i % 3) * 0.05).toFixed(2),
 			reviews: base.reviews,
-			price: `$${price}`,
+			price: `€${price}`,
 			amazonUrl: base.amazonUrl,
 			description: base.description,
 		};
@@ -109,9 +120,18 @@ const parseProductsTxt = (text: string): RawProduct[] => {
 
 const ProductsSection = () => {
 	const [query, setQuery] = useState("");
-	const [products, setProducts] = useState(() => generateProducts(defaultBaseProducts));
+	// typed to Product[] instead of implicit any
+	const [products, setProducts] = useState<Product[]>(() => generateProducts(defaultBaseProducts));
 	const [loading, setLoading] = useState(false);
 	const [source, setSource] = useState<"file" | "default">("default");
+	// new: category filter state
+	const [categoryFilter, setCategoryFilter] = useState<string>("");
+
+	// compute available categories from loaded products (including "Unbekannt")
+	const categories = useMemo(() => {
+		const set = new Set(products.map((p) => p.category || "Unbekannt"));
+		return ["", ...Array.from(set).sort()]; // "" will mean all categories
+	}, [products]);
 
 	// Load products from products.txt with fallback to defaults
 	const loadProducts = async () => {
@@ -126,10 +146,10 @@ const ProductsSection = () => {
 				setProducts(generateProducts(defaultBaseProducts));
 				console.warn("ProductsSection: products.txt parsed to empty list; using defaults.");
 			} else {
-				// Map parsed entries to a fixed list of 30 products. If an index is missing, fill with placeholder.
+				// Map parsed entries to a fixed list of 36 products. If an index is missing, fill with placeholder.
 				setSource("file");
-				const total = 30;
-				const finalProducts = Array.from({ length: total }).map((_, i) => {
+				const total = 36;
+				const finalProducts: Product[] = Array.from({ length: total }).map((_, i) => {
 					const p = parsed[i];
 					if (p) {
 						return {
@@ -137,7 +157,7 @@ const ProductsSection = () => {
 							category: p.category,
 							rating: p.rating,
 							reviews: p.reviews,
-							price: `$${p.basePrice.toFixed(2)}`,
+							price: `€${p.basePrice.toFixed(2)}`,
 							amazonUrl: p.amazonUrl,
 							description: p.description,
 						};
@@ -148,15 +168,16 @@ const ProductsSection = () => {
 						category: "Unbekannt",
 						rating: 0,
 						reviews: "0",
-						price: "0£",
+						price: "€0.00",
 						amazonUrl: "#",
 						description: "Keine Daten vorhanden.",
 					};
 				});
 				setProducts(finalProducts);
 			}
-		} catch (err: any) {
-			console.warn("ProductsSection: could not load products.txt, using defaults.", err?.message ?? err);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err);
+			console.warn("ProductsSection: could not load products.txt, using defaults.", message);
 			setSource("default");
 			setProducts(generateProducts(defaultBaseProducts));
 		} finally {
@@ -174,15 +195,15 @@ const ProductsSection = () => {
 
 	const filteredProducts = useMemo(() => {
 		const q = query.trim().toLowerCase();
-		if (!q) return products;
+		if (!q && !categoryFilter) return products;
 		return products.filter((p) => {
-			return (
-				p.name.toLowerCase().includes(q) ||
-				p.category.toLowerCase().includes(q) ||
-				p.description.toLowerCase().includes(q)
-			);
+			const matchesQuery = q
+				? p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
+				: true;
+			const matchesCategory = categoryFilter ? p.category === categoryFilter : true;
+			return matchesQuery && matchesCategory;
 		});
-	}, [query, products]);
+	}, [query, products, categoryFilter]);
 
 	return (
 		<section id="products" className="py-20 md:py-32 bg-secondary/50">
@@ -191,12 +212,28 @@ const ProductsSection = () => {
 					<span className="text-primary font-semibold uppercase tracking-widest text-sm">Empfohlen</span>
 					<h2 className="font-display text-4xl md:text-6xl text-foreground mt-3 mb-4">TOP NAHRUNGSERGÄNZUNGSMITTEL</h2>
 					<p className="text-muted-foreground max-w-xl mx-auto">Persönlich getestet und empfohlene Supplements zur Unterstützung deines Trainings.</p>
+					<p className="text-primary text-sm mt-3">Ich biete allen Kundinnen und Kunden, die ein Produkt auf meiner Website kaufen, eine kostenlose Supplement‑Beratung an, melde dich.</p>
 				</div>
 
 				{/* Search bar + controls */}
 				<div className="max-w-2xl mx-auto mb-8">
-					<div className="flex gap-2">
-						<Input placeholder="Produkte, Kategorien oder Beschreibungen durchsuchen..." value={query} onChange={(e) => setQuery(e.target.value)} />
+					<div className="flex gap-2 flex-col sm:flex-row">
+						<div className="flex gap-2 w-full">
+							<Input placeholder="Produkte, Kategorien oder Beschreibungen durchsuchen..." value={query} onChange={(e) => setQuery(e.target.value)} />
+							{/* Category select */}
+							<select
+								aria-label="Kategorie auswählen"
+								className="rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+								value={categoryFilter}
+								onChange={(e) => setCategoryFilter(e.target.value)}
+							>
+								{categories.map((c) => (
+									<option key={c} value={c}>
+										{c === "" ? "Alle Kategorien" : c}
+									</option>
+								))}
+							</select>
+						</div>
 						{query ? (
 							<Button variant="outline" size="sm" onClick={() => setQuery("")}>Löschen</Button>
 						) : (
@@ -227,16 +264,16 @@ const ProductsSection = () => {
 								<div className="flex items-center gap-2 mb-4">
 									<div className="flex">
 										{[...Array(5)].map((_, i) => (
-											<Star key={i} className={`w-4 h-4 ${i < Math.floor((product as any).rating) ? "text-foreground fill-foreground" : "text-muted"}`} />
+											<Star key={i} className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-foreground fill-foreground" : "text-muted"}`} />
 										))}
 									</div>
-									<span className="text-muted-foreground text-sm">{(product as any).rating} ({(product as any).reviews} Bewertungen)</span>
+									<span className="text-muted-foreground text-sm">{product.rating} ({product.reviews} Bewertungen)</span>
 								</div>
 
 								<div className="flex items-center justify-between">
-									<span className="font-display text-2xl text-foreground">{(product as any).price}</span>
+									<span className="font-display text-2xl text-foreground">{product.price}</span>
 									<Button variant="default" size="sm" asChild>
-										<a href={(product as any).amazonUrl} target="_blank" rel="noopener noreferrer">Bei Amazon ansehen<ExternalLink className="w-4 h-4" /></a>
+										<a href={product.amazonUrl} target="_blank" rel="noopener noreferrer">Bei Amazon ansehen<ExternalLink className="w-4 h-4" /></a>
 									</Button>
 								</div>
 							</div>
@@ -251,3 +288,23 @@ const ProductsSection = () => {
 };
 
 export default ProductsSection;
+
+const FC = "/assets/ali-BNq1UIHG.png";
+
+type AvatarProps = { fixed?: boolean; className?: string; alt?: string };
+
+const Yg = ({ fixed = true, className = "", alt = "Ali" }: AvatarProps) => {
+	const img = (
+		<img
+			src={FC}
+			alt={alt}
+			className={`w-12 h-12 md:w-14 md:h-14 rounded-full object-cover ring-2 ring-white/80 shadow-lg mx-auto md:mx-0 ${className}`}
+		/>
+	);
+
+	// fixed avatar (top-left) for md+ screens
+	if (fixed) return <div className="hidden md:block fixed top-4 left-4 z-[9999]">{img}</div>;
+
+	// non-fixed avatar (used in About section) — center on mobile, left-align on md+
+	return <div className="w-full flex justify-center md:justify-start">{img}</div>;
+};
