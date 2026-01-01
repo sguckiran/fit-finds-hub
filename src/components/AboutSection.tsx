@@ -2,12 +2,20 @@ import TopLeftAvatar from "@/components/TopLeftAvatar";
 
 const AboutSection = () => {
   return (
-    <section id="about" className="py-20 md:py-32 bg-background/80">
+    <section id="about" className="py-20 md:py-32">
       <div className="container px-4">
         <div className="max-w-4xl mx-auto bg-card rounded-2xl p-8 md:p-12 shadow-card">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 text-center md:text-left">
               <TopLeftAvatar fixed={false} className="w-32 h-32 md:w-48 md:h-48" alt="Ali" />
+              <div className="mt-4">
+                <div className="text-foreground font-semibold text-lg md:text-xl">Ali Sayinbatur</div>
+                <div className="text-muted-foreground text-sm mt-2 space-y-1">
+                  <div>Diplom-Sport- und Fitnesstrainer</div>
+                  <div>Diplom-Medical-Fitness-Coach</div>
+                  <div>Diplom-Gesundheitsbetriebswirt</div>
+                </div>
+              </div>
             </div>
             <div>
               <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">Über mich</h2>
@@ -28,4 +36,3 @@ const AboutSection = () => {
 };
 
 export default AboutSection;
-

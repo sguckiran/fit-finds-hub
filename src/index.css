@@ -7,13 +7,14 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Change: subtle grey tint for page background, keep cards white */
+    --background: 0 0% 97%; /* was 100% (pure white) -> now slightly grey */
     --foreground: 0 0% 8%;
 
-    --card: 0 0% 98%;
+    --card: 0 0% 100%; /* ensure cards remain pure white */
     --card-foreground: 0 0% 8%;
 
-    --popover: 0 0% 100%;
+    --popover: 0 0% 100%; /* keep popovers white */
     --popover-foreground: 0 0% 8%;
 
     --primary: 0 0% 12%;
