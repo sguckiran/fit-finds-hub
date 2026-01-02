@@ -195,11 +195,13 @@ const ProductsSection = () => {
 
 	const filteredProducts = useMemo(() => {
 		const q = query.trim().toLowerCase();
+		// if no query and no category filter, return all
 		if (!q && !categoryFilter) return products;
 		return products.filter((p) => {
-			const matchesQuery = q
-				? p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
-				: true;
+			const name = p.name ? p.name.toLowerCase() : "";
+			const cat = p.category ? p.category.toLowerCase() : "";
+			const desc = p.description ? p.description.toLowerCase() : "";
+			const matchesQuery = q ? name.includes(q) || cat.includes(q) || desc.includes(q) : true;
 			const matchesCategory = categoryFilter ? p.category === categoryFilter : true;
 			return matchesQuery && matchesCategory;
 		});
@@ -219,7 +221,11 @@ const ProductsSection = () => {
 				<div className="max-w-2xl mx-auto mb-8">
 					<div className="flex gap-2 flex-col sm:flex-row">
 						<div className="flex gap-2 w-full">
-							<Input placeholder="Produkte, Kategorien oder Beschreibungen durchsuchen..." value={query} onChange={(e) => setQuery(e.target.value)} />
+							<Input
+								placeholder="Produkte, Kategorien oder Beschreibungen durchsuchen..."
+								value={query}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.currentTarget.value)}
+							/>
 							{/* Category select */}
 							<select
 								aria-label="Kategorie auswählen"
@@ -228,16 +234,16 @@ const ProductsSection = () => {
 								onChange={(e) => setCategoryFilter(e.target.value)}
 							>
 								{categories.map((c) => (
-									<option key={c} value={c}>
+									<option key={c || "all"} value={c}>
 										{c === "" ? "Alle Kategorien" : c}
 									</option>
 								))}
 							</select>
 						</div>
 						{query ? (
-							<Button variant="outline" size="sm" onClick={() => setQuery("")}>Löschen</Button>
+							<Button variant="outline" size="sm" onClick={() => { setQuery(""); setCategoryFilter(""); }}>Löschen</Button>
 						) : (
-							<Button variant="default" size="sm" onClick={() => setQuery("")}>Alle</Button>
+							<Button variant="default" size="sm" onClick={() => { setQuery(""); setCategoryFilter(""); }}>Alle</Button>
 						)}
 
 						{/* Reload products.txt at runtime */}
@@ -249,8 +255,8 @@ const ProductsSection = () => {
 				</div>
 
 				<div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-					{filteredProducts.map((product) => (
-						<div key={product.name} className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow">
+					{filteredProducts.map((product, idx) => (
+						<div key={`${product.name}-${idx}`} className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-glow">
 							{/* Product Image Placeholder */}
 							<div className="h-48 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
 								<span className="text-6xl opacity-30">💪</span>
@@ -298,13 +304,13 @@ const Yg = ({ fixed = true, className = "", alt = "Ali" }: AvatarProps) => {
 		<img
 			src={FC}
 			alt={alt}
-			className={`w-12 h-12 md:w-14 md:h-14 rounded-full object-cover ring-2 ring-white/80 shadow-lg mx-auto md:mx-0 ${className}`}
+			className={`w-14 h-14 md:w-16 md:h-16 rounded-full object-cover ring-2 ring-white/80 shadow-lg mx-auto ${className}`}
 		/>
 	);
 
 	// fixed avatar (top-left) for md+ screens
-	if (fixed) return <div className="hidden md:block fixed top-4 left-4 z-[9999]">{img}</div>;
+	if (fixed) return <div className="hidden md:block fixed top-4 left-4 z-[99999]">{img}</div>;
 
 	// non-fixed avatar (used in About section) — center on mobile, left-align on md+
-	return <div className="w-full flex justify-center md:justify-start">{img}</div>;
+	return <div className="w-full flex items-center justify-center md:justify-start">{img}</div>;
 };
